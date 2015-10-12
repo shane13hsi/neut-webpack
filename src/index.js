@@ -1,1 +1,5 @@
-module.exports = require('./makeConfig');
+module.exports = {
+  makeConfig: require('./makeConfig'),
+  devServer: require('./devServer')
+};
+
