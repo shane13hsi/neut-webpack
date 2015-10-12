@@ -1,4 +1,4 @@
-var defaultSpec = require('./spec.js');
+var defaultSpec = require('./defaultSpec');
 var webpack = require('webpack');
 var ip = require('ip');
 var ipAddress = ip.address();

@@ -1,6 +1,5 @@
 var WebpackDevServer = require("webpack-dev-server");
 var webpack = require("webpack");
-var constants = require('./spec');
 var ip = require('ip');
 var ipAddress = ip.address();
 
