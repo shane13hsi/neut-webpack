@@ -7,6 +7,8 @@ var NyanProgressPlugin = require('nyan-progress-webpack-plugin');
 module.exports = function (spec) {
   var finalSpec = _.assign(defaultSpec, spec);
   return {
+    cache: finalSpec.dev,
+    debug: finalSpec.dev,
     devtool: finalSpec.dev ? 'eval' : undefined,
 
     entry: function () {
