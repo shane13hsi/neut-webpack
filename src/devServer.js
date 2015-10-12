@@ -2,6 +2,7 @@ var WebpackDevServer = require("webpack-dev-server");
 var webpack = require("webpack");
 var ip = require('ip');
 var ipAddress = ip.address();
+var defaultSpec = require('./defaultSpec');
 
 module.exports = function (config) {
   var compiler = webpack(config);
@@ -26,11 +27,11 @@ module.exports = function (config) {
     }
   });
 
-  bundler.listen('9216', "0.0.0.0", function (err) {
+  bundler.listen(defaultSpec.webpackDevServerPort, "0.0.0.0", function (err) {
     if (err) {
       console.log(err);
     }
-    console.log('Webpack dev server is Listening at ' + ipAddress + ':' + 9216);
+    console.log('Webpack dev server is Listening at ' + ipAddress + ':' + defaultSpec.webpackDevServerPort);
   });
 
 };

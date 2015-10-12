@@ -3,5 +3,6 @@ module.exports = {
   srcDir: './src',
   entryFileName: undefined,
   outputFileName: 'bundle.js',
-  reduxLogger: false
+  reduxLogger: false,
+  webpackDevServerPort: 9216
 };
