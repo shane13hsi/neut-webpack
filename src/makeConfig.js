@@ -3,41 +3,46 @@ var webpack = require('webpack');
 var ip = require('ip');
 var ipAddress = ip.address();
 var NyanProgressPlugin = require('nyan-progress-webpack-plugin');
+var _assign = require('lodash/object/assign');
+var path = require('path');
 
-module.exports = function (spec) {
-  var finalSpec = _.assign(defaultSpec, spec);
+module.exports = function(spec) {
+  var finalSpec = _assign(defaultSpec, spec);
+
   return {
     cache: finalSpec.dev,
     debug: finalSpec.dev,
     devtool: finalSpec.dev ? 'eval' : undefined,
 
-    entry: function () {
+    entry: (function() {
       if (finalSpec.dev) {
         return [
-          'webpack-dev-server/client?http://' + ipAddress + ':' + finalSpec.devServerPort,
+          'webpack-dev-server/client?http://' + ipAddress + ':' + finalSpec.webpackDevServerPort,
           'webpack/hot/only-dev-server',
-          finalSpec.entryFileName
+          path.join(finalSpec.srcDir, finalSpec.entryFileName)
         ];
       } else {
         return [finalSpec.entryFileName];
       }
+    })(),
+
+    module: {
+      loaders: (function() {
+        var loaders = [
+          { test: /\.(scss|sass)$/, loader: 'style!css!sass' },
+          { test: /\.(gif|jpg|png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=10000' }
+        ];
+
+        if (finalSpec.dev) {
+          loaders.push({ test: /\.jsx?$/, include: finalSpec.srcDir, loaders: ['react-hot', 'babel-loader'] });
+        } else {
+          loaders.push({ test: /\.jsx?$/, include: finalSpec.srcDir, loaders: ['babel-loader'] });
+        }
+        return loaders;
+      })()
     },
 
-    module: function () {
-      var loaders = [
-        { test: /\.(scss|sass)$/, loader: 'style!css!sass' },
-        { test: /\.(gif|jpg|png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=10000' }
-      ];
-
-      if (finalSpec.dev) {
-        loaders.push({ test: /\.jsx?$/, include: finalSpec.srcDir, loaders: ['react-hot', 'babel-loader'] });
-      } else {
-        loaders.push({ test: /\.jsx?$/, include: finalSpec.srcDir, loaders: ['babel-loader'] });
-      }
-      return loaders;
-    },
-
-    output: function () {
+    output: (function() {
       if (finalSpec.dev) {
         return {
           path: '/build/',
@@ -50,9 +55,9 @@ module.exports = function (spec) {
           filename: finalSpec.outputFileName
         };
       }
-    },
+    })(),
 
-    plugins: function () {
+    plugins: (function() {
       if (finalSpec.dev) {
         return [
           new webpack.DefinePlugin({
@@ -85,7 +90,7 @@ module.exports = function (spec) {
           })
         ];
       }
-    },
+    })(),
 
     resolve: {
       extensions: ['', '.js', '.jsx', '.json']
