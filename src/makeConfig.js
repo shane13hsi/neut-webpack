@@ -22,7 +22,9 @@ module.exports = function(spec) {
           path.join(finalSpec.srcDir, finalSpec.entryFileName)
         ];
       } else {
-        return [finalSpec.entryFileName];
+        return [
+          path.join(finalSpec.srcDir, finalSpec.entryFileName)
+        ];
       }
     })(),
 
@@ -45,13 +47,13 @@ module.exports = function(spec) {
     output: (function() {
       if (finalSpec.dev) {
         return {
-          path: '/build/',
+          path: '/build',
           filename: finalSpec.outputFileName,
-          publicPath: '/build/'
+          publicPath: '/build'
         };
       } else {
         return {
-          path: '/dist',
+          path: finalSpec.distDir,
           filename: finalSpec.outputFileName
         };
       }
@@ -69,27 +71,35 @@ module.exports = function(spec) {
           new NyanProgressPlugin(),
           new webpack.HotModuleReplacementPlugin()
         ];
-      } else {
+      }
+      if (process.env.NODE_ENV === 'production') {
         return [
           new webpack.DefinePlugin({
-            'process.env': {
-              NODE_ENV: JSON.stringify('production')
-            }
+            __REACT_DEVTOOLS_GLOBAL_HOOK__: false
           }),
           new NyanProgressPlugin(),
           new webpack.optimize.DedupePlugin(),  // 去重
           new webpack.optimize.OccurenceOrderPlugin(),  // 使用频繁的 modules ，分配的 id 更短。也同时保证了 moduels 顺序的一直
           new webpack.optimize.UglifyJsPlugin({
             compress: {
+              keep_fnames: true,
               warnings: false
             },
             output: {
               comments: false
             },
-            sourceMap: false
+            mangle: {
+              keep_fnames: true
+            }
           })
         ];
       }
+      return [
+        new webpack.DefinePlugin({
+          __REDUX_LOGGER__: finalSpec.reduxLogger
+        }),
+        new NyanProgressPlugin()
+      ];
     })(),
 
     resolve: {
