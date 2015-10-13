@@ -54,9 +54,9 @@ module.exports = function(spec) {
     output: (function() {
       if (finalSpec.dev) {
         return {
-          path: '/build',
+          path: '/build/',
           filename: finalSpec.outputFileName,
-          publicPath: '/build'
+          publicPath: '/build/'
         };
       } else {
         return {
