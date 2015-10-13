@@ -12,7 +12,7 @@ module.exports = function(spec) {
   return {
     cache: finalSpec.dev,
     debug: finalSpec.dev,
-    devtool: finalSpec.dev ? 'eval' : undefined,
+    devtool: finalSpec.dev ? 'eval' : false,
 
     entry: (function() {
       if (finalSpec.dev) {
@@ -30,17 +30,23 @@ module.exports = function(spec) {
 
     module: {
       loaders: (function() {
-        var loaders = [
-          { test: /\.(scss|sass)$/, loader: 'style!css!sass' },
-          { test: /\.(gif|jpg|png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=10000' }
-        ];
-
         if (finalSpec.dev) {
-          loaders.push({ test: /\.jsx?$/, include: finalSpec.srcDir, loaders: ['react-hot', 'babel-loader'] });
+          return [
+            { test: /\.css$/, loader: 'style!css' },
+            { test: /\.less$/, loader: 'style!css!less' },
+            { test: /\.(scss|sass)$/, loader: 'style!css!sass' },
+            { test: /\.(gif|jpg|png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=10000' },
+            { test: /\.jsx?$/, include: finalSpec.srcDir, loaders: ['react-hot', 'babel-loader'] }
+          ];
         } else {
-          loaders.push({ test: /\.jsx?$/, include: finalSpec.srcDir, loaders: ['babel-loader'] });
+          return [
+            { test: /\.css$/, loader: ExtractTextPlugin.extract("style-loader", "css-loader") },
+            { test: /\.less$/, loader: ExtractTextPlugin.extract("style-loader", "css!less") },
+            { test: /\.(scss|sass)$/, loader: ExtractTextPlugin.extract("style-loader", "css!sass") },
+            { test: /\.(gif|jpg|png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=10000' },
+            { test: /\.jsx?$/, include: finalSpec.srcDir, loader: 'babel-loader' }
+          ]
         }
-        return loaders;
       })()
     },
 
@@ -63,9 +69,6 @@ module.exports = function(spec) {
       if (finalSpec.dev) {
         return [
           new webpack.DefinePlugin({
-            'process.env': {
-              NODE_ENV: JSON.stringify('development')
-            },
             __REDUX_LOGGER__: finalSpec.reduxLogger
           }),
           new NyanProgressPlugin(),
@@ -77,6 +80,7 @@ module.exports = function(spec) {
           new webpack.DefinePlugin({
             __REACT_DEVTOOLS_GLOBAL_HOOK__: false
           }),
+          new ExtractTextPlugin("style.css"),
           new NyanProgressPlugin(),
           new webpack.optimize.DedupePlugin(),  // 去重
           new webpack.optimize.OccurenceOrderPlugin(),  // 使用频繁的 modules ，分配的 id 更短。也同时保证了 moduels 顺序的一直
