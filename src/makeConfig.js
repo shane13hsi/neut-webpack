@@ -5,6 +5,7 @@ var ipAddress = ip.address();
 var NyanProgressPlugin = require('nyan-progress-webpack-plugin');
 var _assign = require('lodash/object/assign');
 var path = require('path');
+var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 module.exports = function(spec) {
   var finalSpec = _assign(defaultSpec, spec);
